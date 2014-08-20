@@ -56,36 +56,34 @@ component accessors="true" {
 	* @hint Returns a lexically sorted array of struct parameters for the request
 	*/
 	public array function getSortedParameters() {
-		var stringUtil = new com.brianflove.utils.StringUtil();
-		
 		//add oauth_nonce parameter
 		if (not parameterIsDefined(key="oauth_nonce")) {
-			addParameter(key="oauth_nonce", value=stringUtil.percentEncode(value=getNonce()));
+			addParameter(key="oauth_nonce", value=getNonce());
 		}
 		
 		//add oauth_timestamp parameter
 		if (not parameterIsDefined(key="oauth_timestamp")) {
-			addParameter(key="oauth_timestamp", value=stringUtil.percentEncode(value=getTimestamp()));
+			addParameter(key="oauth_timestamp", value=getTimestamp());
 		}
 		
 		//add oauth_version parameter
 		if (not parameterIsDefined(key="oauth_version")) {
-			addParameter(key="oauth_version", value=stringUtil.percentEncode(value=getVersion()));
+			addParameter(key="oauth_version", value=getVersion());
 		}
 		
 		//add oauth_consumer_key parameter
 		if (not parameterIsDefined(key="oauth_consumer_key")) {
-			addParameter(key="oauth_consumer_key", value=stringUtil.percentEncode(value=getConsumer().getKey()));
+			addParameter(key="oauth_consumer_key", value=getConsumer().getKey());
 		}
 		
 		//add oauth_callback parameter
 		if (not parameterIsDefined(key="oauth_callback") AND StructKeyExists(variables, "callback") AND Len(getCallback())) {
-			addParameter(key="oauth_callback", value=stringUtil.percentEncode(value=getCallback()));
+			addParameter(key="oauth_callback", value=getCallback());
 		}
 		
 		//add oauth_token parameter
-		if (not parameterIsDefined(key="oauth_token")) {
-			addParameter(key="oauth_token", value=stringUtil.percentEncode(value=this.getToken().getKey()));
+		if (not parameterIsDefined(key="oauth_token") AND Len(this.getToken().getKey())) {
+			addParameter(key="oauth_token", value=this.getToken().getKey());
 		}
 		
 		//sort keys

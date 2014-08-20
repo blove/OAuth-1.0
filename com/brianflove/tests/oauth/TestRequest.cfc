@@ -1,5 +1,6 @@
 component extends="com.brianflove.tests.UnitTest" {
 	
+	//NOTE: before testing you must provide your consumer key and consumer secret for the Twitter API
 	variables.CONSUMER_KEY = "";
 	variables.CONSUMER_SECRET = "";
 	
@@ -50,7 +51,7 @@ component extends="com.brianflove.tests.UnitTest" {
 		request.setConsumer(consumer);
 		request.setToken(token);
 		
-		//use plain text signature method
+		//use HMAC-SHA1 signature method
 		var signatureMethod = new com.brianflove.oauth.methods.HmacSha1SignatureMethod();
 		
 		//sign request
@@ -82,7 +83,7 @@ component extends="com.brianflove.tests.UnitTest" {
 		request.setConsumer(consumer);
 		request.setToken(token);
 		
-		//use plain text signature method
+		//use HMAC-SHA1 signature method
 		var signatureMethod = new com.brianflove.oauth.methods.HmacSha1SignatureMethod();
 		
 		//sign request
@@ -109,16 +110,13 @@ component extends="com.brianflove.tests.UnitTest" {
 		request.setConsumer(consumer);
 		request.setToken(token);
 		
-		//use plain text signature method
+		//use HMAC-SHA1 signature method
 		var signatureMethod = new com.brianflove.oauth.methods.HmacSha1SignatureMethod();
 		
 		//sign request
 		request.signWithSignatureMethod(signatureMethod=signatureMethod);
 		
-		//get authorization header
-		var header = request.toHeader();
-		
-		//GET using request URL
+		//POST using request URL
 		var httpRequest = new Http();
 		httpRequest.setUrl(request.getUrl());
 		httpRequest.setMethod(request.getMethod());
@@ -148,14 +146,7 @@ component extends="com.brianflove.tests.UnitTest" {
 		assertTrue("There are not field-value pairs in the response.", ArrayLen(keys));
 		
 		//validate oauth_token key
-		var oauthToken = "";
-		for (var key in keys) {
-			if (key == "oauth_token") {
-				oauthToken = parameters[key];
-				break;
-			}
-		}
-		assertTrue("The oauth_token field is not in the response.", Len(oauthToken));
+		assertTrue("The oauth_token field is not in the response.", StructKeyExists(parameters, "oauth_token"));
 	}
 	
 }
