@@ -35,12 +35,19 @@
 	<cfset httpRequest.setUrl(oAuthRequest.getUrl())>
 	<cfset httpRequest.setMethod(oAuthRequest.getMethod())>
 	<cfset httpRequest.addParam(type="header", name="Authorization", value=oAuthRequest.toHeader())>
-	<cfset httpRequest.addParam(type="header", name="Content-Type", value="application/x-www-form-urlencoded")>
 	<cfset httpRequest.setCharset("utf-8")>
 	<cfset httpResult = httpRequest.send().getPrefix()>
 	
+	<!---Parse JSON response--->
 	<cfset credentials = DeserializeJson(httpResult.fileContent)>
 </cfsilent>
-
-<h1>Your Credentials</h1>
-<cfdump var="#credentials#">
+<cfoutput>
+	<h1>Hello #credentials.name#</h1>
+	<p>Here is some data about you.</p>
+	<ul>
+		<li>Your Twitter id: #credentials.id#</li>
+		<li>Your Twitter username: #credentials.screen_name#</li>
+		<li>You have #credentials.followers_count# followers</li>
+		<li>You have tweeted #credentials.statuses_count# times</li>
+	</ul>
+</cfoutput>
