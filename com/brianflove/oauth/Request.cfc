@@ -228,7 +228,7 @@ component accessors="true" {
 		//validate HTTP method
 		if (not ReFindNoCase("(get|post)", arguments.method)) {
 			var exception = new com.brianflove.exceptions.InvalidArgumentTypeException();
-			exception.throw(message="The method must be either GET or SET.");
+			exception.throw(message="The method must be either GET or POST.");
 		}
 		variables.method = UCase(arguments.method);
 	}

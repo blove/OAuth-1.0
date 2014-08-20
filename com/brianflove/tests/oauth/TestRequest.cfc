@@ -1,7 +1,7 @@
 component extends="com.brianflove.tests.UnitTest" {
 	
-	variables.CONSUMER_KEY = "QOsPrndJhDZeLorlxc7hzz2eA";
-	variables.CONSUMER_SECRET = "bgzKYWMjFr6zNvNKVlENpagzXPbJIK1Qta4hJtdBjU2HxTMBwC";
+	variables.CONSUMER_KEY = "";
+	variables.CONSUMER_SECRET = "";
 	
 	public void function testPlainTextSignature() {
 		var request = new com.brianflove.oauth.Request();
