@@ -1,9 +1,9 @@
 component accessors="true" {
 	
+	property type="string" name="callback";
 	property type="com.brianflove.oauth.Consumer" name="consumer";
 	property type="string" name="method";
 	property type="string" name="nonce";
-	property type="numeric" name="timestamp";
 	property type="com.brianflove.oauth.Token" name="token";
 	property type="string" name="url";
 	property type="string" name="version";
@@ -76,6 +76,16 @@ component accessors="true" {
 		//add oauth_consumer_key parameter
 		if (not parameterIsDefined(key="oauth_consumer_key")) {
 			addParameter(key="oauth_consumer_key", value=stringUtil.percentEncode(value=getConsumer().getKey()));
+		}
+		
+		//add oauth_callback parameter
+		if (not parameterIsDefined(key="oauth_callback") AND StructKeyExists(variables, "callback") AND Len(getCallback())) {
+			addParameter(key="oauth_callback", value=stringUtil.percentEncode(value=getCallback()));
+		}
+		
+		//add oauth_token parameter
+		if (not parameterIsDefined(key="oauth_token")) {
+			addParameter(key="oauth_token", value=stringUtil.percentEncode(value=this.getToken().getKey()));
 		}
 		
 		//sort keys
@@ -164,26 +174,37 @@ component accessors="true" {
 	* @hint Returns the authorization header for the signed request.
 	*/
 	public string function toHeader() {
-		var parameters = CreateObject("java", "java.lang.StringBuilder").init();
+		var stringUtil = new com.brianflove.utils.StringUtil();
+		var header = CreateObject("java", "java.lang.StringBuilder").init();
+		header.append("OAuth ");
 		
 		//build encoded key=value string
 		for (var sortedParameter in getSortedParameters()) {
 			var keys = StructKeyArray(sortedParameter);
 			for (var key in keys) {
 				if (ReFindNoCase("^oauth_", key)) {
-					parameters.append(key);
-					parameters.append('="');
-					parameters.append(sortedParameter[key]);
-					parameters.append('"');
+					header.append(stringUtil.percentEncode(key));
+					header.append('="');
+					header.append(stringUtil.percentEncode(sortedParameter[key]));
+					header.append('"');
 				}
 			}
-			parameters.append(",");
+			header.append(", ");
 		}
 		
-		//remove trailing comma
-		parameters.deleteCharAt(parameters.length()-1);
+		//remove trailing comma and space
+		header.deleteCharAt(header.length()-1);
+		header.deleteCharAt(header.length()-1);
 		
-		return parameters.toString();
+		return header.toString();
+	}
+	
+	/**
+	* @hint Returns the number of seconds since the epoch
+	*/
+	public numeric function getTimestamp() {
+		var ts = CreateObject("java", "java.util.Date").getTime();
+		return Int(ts/1000);
 	}
 	
 	/**
@@ -200,24 +221,12 @@ component accessors="true" {
 	}
 	
 	/**
-	* @hint Override the getTimestamp accessor to set the number of milliseconds since the epoch
-	*/
-	public numeric function getTimestamp() {
-		//generate timestamp if not already set
-		if (not StructKeyExists(variables, "timestamp") OR (StructKeyExists(variables, "timestamp") AND not Len(variables.timestamp))) {
-			var ts = CreateObject("java", "java.util.Date").getTime();
-			setTimestamp(ts);
-		}
-		return variables.timestamp;
-	}
-	
-	/**
 	* @hint Override the setMethod mutator to validate the HTTP method.
 	*		I throw the InvalidArgumentTypeException if the method provided is not valid.
 	*/
 	public void function setMethod(required string method) {
 		//validate HTTP method
-		if (not ReFindNoCase("(get|set)", arguments.method)) {
+		if (not ReFindNoCase("(get|post)", arguments.method)) {
 			var exception = new com.brianflove.exceptions.InvalidArgumentTypeException();
 			exception.throw(message="The method must be either GET or SET.");
 		}
@@ -230,7 +239,7 @@ component accessors="true" {
 	*/
 	public void function setUrl(required string url) {
 		//validate properly formed URL
-		if (not ReFindNoCase("^https?:\/\/([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$", arguments.url)) {
+		if (not ReFindNoCase("^https?:\/\/localhost([\/\w \.-]*)*\/?$", arguments.url) AND not ReFindNoCase("^https?:\/\/([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$", arguments.url)) {
 			var exception = new com.brianflove.exceptions.InvalidArgumentTypeException();
 			exception.throw(message="A valid URL must be set for the OAuth Request.");
 		}

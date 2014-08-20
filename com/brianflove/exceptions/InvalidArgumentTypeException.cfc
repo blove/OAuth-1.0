@@ -11,7 +11,7 @@ component extends="AbstractException" {
 		if (not Len(arguments.message) AND IsObject(variables.component) AND Len(variables.methodName) AND Len(variables.argumentName)) {
 			arguments.message = "Invalid type passed to #getMethodName()#.#getArgumentName()#() in #GetMetaData(getComponent()).fullname#.";
 		}
-		super.throw(message=arguments.message, detail=arguments.detail;
+		super.throw(message=arguments.message, detail=arguments.detail);
 	}
 	
 }
