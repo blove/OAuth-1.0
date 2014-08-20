@@ -26,7 +26,7 @@ component accessors="true" {
 	*/
 	public string function getParameter(required string key) {
 		if (not parameterIsDefined(key=arguments.key)) {
-			throw(message="The parameter is not defined." detail="#arguments.key# is an invalid parameter key.");
+			throw(message="The parameter is not defined.", detail="#arguments.key# is an invalid parameter key.");
 		}
 		return variables.parameters[arguments.key];
 	}
