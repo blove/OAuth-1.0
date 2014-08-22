@@ -24,7 +24,7 @@ component implements="com.brianflove.oauth.methods.SignatureMethod" {
 		var signatureBase = CreateObject("java", "java.lang.StringBuilder").init();
 		signatureBase.append(arguments.request.getMethod());
 		signatureBase.append("&");
-		signatureBase.append(stringUtil.percentEncode(value=arguments.request.getUrl()));
+		signatureBase.append(stringUtil.percentEncode(value=ReReplaceNoCase(arguments.request.getUrl(), "\?.*$", "")));
 		signatureBase.append("&");
 		signatureBase.append(stringUtil.percentEncode(value=parameters.toString()));
 		
