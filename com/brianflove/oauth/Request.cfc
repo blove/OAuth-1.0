@@ -237,7 +237,7 @@ component accessors="true" {
 	*/
 	public void function setUrl(required string url) {
 		//validate properly formed URL
-		if (not ReFindNoCase("^https?:\/\/localhost([\/\w \.-]*)*\/?$", arguments.url) AND not ReFindNoCase("^https?:\/\/([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$", arguments.url)) {
+		if (!IsValid("URL", arguments.url)) {
 			var exception = new com.brianflove.exceptions.InvalidArgumentTypeException();
 			exception.throw(message="A valid URL must be set for the OAuth Request.");
 		}
