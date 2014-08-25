@@ -238,9 +238,22 @@ component accessors="true" {
 	public void function setUrl(required string url) {
 		//validate properly formed URL
 		if (!IsValid("URL", arguments.url)) {
-			var exception = new com.brianflove.exceptions.InvalidArgumentTypeException();
+			var exception = new com.webucator.exceptions.InvalidArgumentTypeException();
 			exception.throw(message="A valid URL must be set for the OAuth Request.");
 		}
+		
+		//parse query string parameters
+		if (ReFindNoCase("\?[0-9a-z-_\.~]+=[0-9a-z-_\.~](&[0-9a-z-_\.~]+=[0-9a-z-_\.~])*", arguments.url)) {
+			var queryString = ReReplaceNoCase(arguments.url, "^.*\?", "");
+			var pairs = ListToArray(queryString, "&");
+			for (var pair in pairs) {
+				var key = ListGetAt(pair, 1, "=");
+				var value = ListGetAt(pair, 2, "=");
+				variables.parameters[key] = value;
+			}
+			arguments.url = ReReplaceNoCase(arguments.url, "\?.*$", "");
+		}
+		
 		variables.url = arguments.url;
 	}
 	
