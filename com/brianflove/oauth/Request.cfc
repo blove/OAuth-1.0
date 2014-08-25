@@ -25,7 +25,7 @@ component accessors="true" {
 	* @hint Retreive a parameter value.
 	*/
 	public string function getParameter(required string key) {
-		if (not parameterIsDefined(key=arguments.key)) {
+		if (!parameterIsDefined(key=arguments.key)) {
 			throw(message="The parameter is not defined.", detail="#arguments.key# is an invalid parameter key.");
 		}
 		return variables.parameters[arguments.key];
@@ -57,32 +57,32 @@ component accessors="true" {
 	*/
 	public array function getSortedParameters() {
 		//add oauth_nonce parameter
-		if (not parameterIsDefined(key="oauth_nonce")) {
+		if (!parameterIsDefined(key="oauth_nonce")) {
 			addParameter(key="oauth_nonce", value=getNonce());
 		}
 		
 		//add oauth_timestamp parameter
-		if (not parameterIsDefined(key="oauth_timestamp")) {
+		if (!parameterIsDefined(key="oauth_timestamp")) {
 			addParameter(key="oauth_timestamp", value=getTimestamp());
 		}
 		
 		//add oauth_version parameter
-		if (not parameterIsDefined(key="oauth_version")) {
+		if (!parameterIsDefined(key="oauth_version")) {
 			addParameter(key="oauth_version", value=getVersion());
 		}
 		
 		//add oauth_consumer_key parameter
-		if (not parameterIsDefined(key="oauth_consumer_key")) {
+		if (!parameterIsDefined(key="oauth_consumer_key")) {
 			addParameter(key="oauth_consumer_key", value=getConsumer().getKey());
 		}
 		
 		//add oauth_callback parameter
-		if (not parameterIsDefined(key="oauth_callback") AND StructKeyExists(variables, "callback") AND Len(getCallback())) {
+		if (!parameterIsDefined(key="oauth_callback") AND StructKeyExists(variables, "callback") AND Len(getCallback())) {
 			addParameter(key="oauth_callback", value=getCallback());
 		}
 		
 		//add oauth_token parameter
-		if (not parameterIsDefined(key="oauth_token") AND Len(this.getToken().getKey())) {
+		if (!parameterIsDefined(key="oauth_token") AND Len(this.getToken().getKey())) {
 			addParameter(key="oauth_token", value=this.getToken().getKey());
 		}
 		
@@ -120,7 +120,9 @@ component accessors="true" {
 		}
 		
 		//remove trailing ampersand
-		parameters.deleteCharAt(parameters.length()-1);
+		if (parameters.length() > 0) {
+			parameters.deleteCharAt(parameters.length()-1);
+		}
 		
 		return parameters.toString();
 	}
@@ -130,12 +132,12 @@ component accessors="true" {
 	*/
 	public void function signWithSignatureMethod(required com.brianflove.oauth.methods.SignatureMethod signatureMethod) {
 		//validate HTTP method
-		if (not StructKeyExists(variables, "method")) {
+		if (!StructKeyExists(variables, "method")) {
 			throw(message="You must set the HTTP method before signing a request.");
 		}
 		
 		//validate HTTP url
-		if (not StructKeyExists(variables, "url")) {
+		if (!StructKeyExists(variables, "url")) {
 			throw(message="You must set the HTTP url before signing a request.");
 		}
 		
@@ -184,10 +186,9 @@ component accessors="true" {
 					header.append(stringUtil.percentEncode(key));
 					header.append('="');
 					header.append(stringUtil.percentEncode(sortedParameter[key]));
-					header.append('"');
+					header.append('", ');
 				}
 			}
-			header.append(", ");
 		}
 		
 		//remove trailing comma and space
@@ -210,7 +211,7 @@ component accessors="true" {
 	*/
 	public string function getNonce() {
 		//generate nonce if not already set
-		if (not StructKeyExists(variables, "nonce") OR (StructKeyExists(variables, "nonce") AND not Len(variables.nonce))) {
+		if (!StructKeyExists(variables, "nonce") OR (StructKeyExists(variables, "nonce") AND !Len(variables.nonce))) {
 			var uuid = ReReplaceNoCase(CreateUUID(), "[^a-z0-9]", "", "all");
 			var hashedNonce = Hash(uuid, "MD5");
 			setNonce(hashedNonce);
@@ -224,7 +225,7 @@ component accessors="true" {
 	*/
 	public void function setMethod(required string method) {
 		//validate HTTP method
-		if (not ReFindNoCase("(get|post)", arguments.method)) {
+		if (!ReFindNoCase("(get|post)", arguments.method)) {
 			var exception = new com.brianflove.exceptions.InvalidArgumentTypeException();
 			exception.throw(message="The method must be either GET or POST.");
 		}
